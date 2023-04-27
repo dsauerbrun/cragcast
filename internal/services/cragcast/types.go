@@ -9,22 +9,26 @@ type Cragcast struct {
 type DailyForecast struct {
 	Date time.Time
 	// these are the headlines for the day
-	TotalPrecip         float64
-	ChanceOfPrecip      float64
-	LowOfDayFahrenheit  float64
-	HighOfDayFahrenheit float64
-	Cloudiness          float64
-	HumidityHigh        float64
+	TotalPrecipMm       *float32
+	ChanceOfPrecip      *float32
+	LowOfDayFahrenheit  *float32
+	HighOfDayFahrenheit *float32
+	avgSkyCoverPercent  *float32
+	HumidityHigh        *float32
+	snowfallMm          *float32
 	// hourly data that will be useful for graphing
 	Hours []*HourlyForecast
 }
 
 type HourlyForecast struct {
-	TotalPrecip           float64
-	ChanceOfPrecip        float64
-	TemperatureFahrenheit float64
-	Cloudiness            float64
-	Humidity              float64
+	TotalPrecipMm         *float32
+	ChanceOfPrecip        *float32
+	TemperatureFahrenheit *float32
+	skyCoverPercent       *float32
+	Humidity              *float32
+	snowfallMm            *float32
+	windDegrees           *float32
+	windKmH               *float32
 	StartOfHour           time.Time
 	EndOfHour             time.Time
 }
