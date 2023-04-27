@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
-	client "github.com/dsauerbrun/cragcast/pkg/weather-client"
+	cragcast "github.com/dsauerbrun/cragcast/internal/services/cragcast"
 )
 
 const (
@@ -13,11 +13,10 @@ const (
 )
 
 type Controllers struct {
-	cl client.WeatherClient
 }
 
 func (c *Controllers) GetForecast(w http.ResponseWriter, r *http.Request) {
-	forcast, err := c.cl.GetForecast(40.0294122, -105.3223779)
+	forecast, err := cragcast.GetForecast(1)
 	if err != nil {
 		// TODO(joshrosso): need to be more thoughtful with the error
 		// message we pass back in the body
@@ -25,25 +24,25 @@ func (c *Controllers) GetForecast(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	forcastJSON, err := json.Marshal(forcast)
+	forecastJSON, err := json.Marshal(*forecast)
 	if err != nil {
 		// TODO(joshrosso): need to be more thoughtful with the error
 		// message we pass back in the body
 		respondWithInternalServerError(w, err)
 		return
 	}
-	_, err = w.Write(forcastJSON)
+	_, err = w.Write(forecastJSON)
 	if err != nil {
 		// TODO(joshrosso): need to be more thoughtful with the error
 		// message we pass back in the body
 		respondWithInternalServerError(w, err)
 		return
 	}
-	w.Header().Set("Content-Type", http.DetectContentType(forcastJSON))
+	w.Header().Set("Content-Type", http.DetectContentType(forecastJSON))
 }
 
 func NewController() Controllers {
-	return Controllers{cl: client.New()}
+	return Controllers{}
 }
 
 func respondWithInternalServerError(w http.ResponseWriter, err error) {
