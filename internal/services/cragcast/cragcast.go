@@ -28,7 +28,7 @@ func GetForecast(cragId int) (*Cragcast, error) {
 	// humidity by the hour as well as highest humidity
 	// TODO: People typically care about the duration from morning until night so we should adjust for location's timezone and only take into account daylight hours
 
-	hourlyForecasts, err := processHours(weatherClientForecast)
+	hourlyForecasts, err := getProcessedHours(weatherClientForecast)
 	if err != nil {
 		return nil, err
 	}
@@ -82,7 +82,7 @@ func GetForecast(cragId int) (*Cragcast, error) {
 	return cragcast, nil
 }
 
-func processHours(weatherClientForecast *noaaTypes.GridpointGeoJson) ([]*HourlyForecast, error) {
+func getProcessedHours(weatherClientForecast *noaaTypes.GridpointGeoJson) ([]*HourlyForecast, error) {
 	hours := []*HourlyForecast{}
 	// make a dictionary where times are the keys and values are hourly forecasts, loop through all sky cover, temp, precip etc...
 	// and add this info to each hour
