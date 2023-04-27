@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+
+	noaaTypes "github.com/dsauerbrun/cragcast/pkg/weather-client/noaa"
 )
 
 const (
@@ -13,7 +15,7 @@ const (
 )
 
 type WeatherClient interface {
-	GetForecast(lat, lng float64) (*ForecastResponse, error)
+	GetForecast(lat, lng float64) (*noaaTypes.GridpointGeoJson, error)
 }
 
 type NoaaClient struct {
@@ -28,7 +30,7 @@ func New() WeatherClient {
 	return newNoaaClient()
 }
 
-func (nc *NoaaClient) GetForecast(lat, lng float64) (*ForecastResponse, error) {
+func (nc *NoaaClient) GetForecast(lat, lng float64) (*noaaTypes.GridpointGeoJson, error) {
 	// 40.0294122,-105.3223779 is lat,lng for boulder
 	pointData, err := nc.getNoaaPointInfo(lat, lng)
 	if err != nil {
@@ -36,7 +38,7 @@ func (nc *NoaaClient) GetForecast(lat, lng float64) (*ForecastResponse, error) {
 	}
 
 	// BOU weather office(boulder), 52X, 75Y is boulder
-	response, err := http.Get(pointData.Properties.ForecastHourly)
+	response, err := http.Get(*pointData.Properties.ForecastGridData)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,7 @@ func (nc *NoaaClient) GetForecast(lat, lng float64) (*ForecastResponse, error) {
 		return nil, err
 	}
 
-	forecastData := &ForecastResponse{}
+	forecastData := &noaaTypes.GridpointGeoJson{}
 	err = json.Unmarshal(responseBody, forecastData)
 	if err != nil {
 		return nil, err
@@ -60,7 +62,7 @@ func newNoaaClient() *NoaaClient {
 	}
 }
 
-func (nc *NoaaClient) getNoaaPointInfo(lat, lng float64) (*PointResponse, error) {
+func (nc *NoaaClient) getNoaaPointInfo(lat, lng float64) (*noaaTypes.PointGeoJson, error) {
 	// cache this in the future as it will basically never change
 	pointUrl := fmt.Sprintf("%s/points/%f,%f", nc.APIEndpoint, lat, lng)
 	response, err := http.Get(pointUrl)
@@ -72,7 +74,7 @@ func (nc *NoaaClient) getNoaaPointInfo(lat, lng float64) (*PointResponse, error)
 		return nil, err
 	}
 
-	pointData := &PointResponse{}
+	pointData := &noaaTypes.PointGeoJson{}
 	err = json.Unmarshal(responseBody, pointData)
 	if err != nil {
 		return nil, err
