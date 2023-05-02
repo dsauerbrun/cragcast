@@ -25,6 +25,9 @@ install: ## Creates a cragcast binary and installs it to $GOBIN.
 	go install ./cragcast
 	@printf $(green_start)"Installed cragcast to "$(install_path)"cragcast"$(green_end)
 
+lint: ## Runs multiple linters against codebase
+	golangci-lint run
+
 ##################
 ## Help targets ##
 ##################
